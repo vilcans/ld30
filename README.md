@@ -1,6 +1,6 @@
-# LD29
+# LD30
 
-My entry for [Ludum Dare](http://www.ludumdare.com/compo/) 29.
+My entry for [Ludum Dare](http://www.ludumdare.com/compo/) 30.
 
 ## Install and run
 
