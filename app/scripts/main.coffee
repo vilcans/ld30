@@ -1,5 +1,5 @@
 class Planet
-    constructor: ({gravity, @diameter, @orbitalPeriod, @orbitalDistance, @launchPeriod}) ->
+    constructor: ({gravity, @diameter, @orbitalPeriod, @orbitalDistance, @launchPeriod, @launchSpeed}) ->
         @gravity = gravity or 0
         @radius = @diameter / 2
         @radiusE = @radius + 2  # radius plus epsilon (launch radius)
@@ -56,30 +56,32 @@ planetData = [
         diameter: 12
         orbitalPeriod: 200
         orbitalDistance: 80
-        gravity: 10000
+        gravity: 1e5
         launchPeriod: 1000
+        launchSpeed: 200
     }
     # 1 mars
     {
         diameter: 15
         orbitalPeriod: 120
         orbitalDistance: 150
-        gravity: 10000
+        gravity: 1e5
         launchPeriod: 20
+        launchSpeed: 200
     }
     # 2 earth
     {
         diameter: 20
         orbitalPeriod: 100
         orbitalDistance: 100
-        gravity: 10000
+        gravity: 1e5
     }
     # 3 sun
     {
         diameter: 60
         orbitalPeriod: 1
         orbitalDistance: 0
-        gravity: 1000000
+        gravity: 1e6
     }
 ]
 if false
@@ -133,8 +135,8 @@ class GameState
                 angle = planet.launcherAngle
                 sin = Math.sin(angle)
                 cos = Math.cos(angle)
-                xspeed = cos * 100 + planet.velocity.x
-                yspeed = sin * 100 + planet.velocity.y
+                xspeed = cos * planet.launchSpeed + planet.velocity.x
+                yspeed = sin * planet.launchSpeed + planet.velocity.y
                 planet.emitter.setXSpeed(xspeed, xspeed)
                 planet.emitter.setYSpeed(yspeed, yspeed)
                 planet.emitter.emitX = planet.center.x + planet.radiusE * cos
