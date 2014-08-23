@@ -4,7 +4,7 @@ class Planet
         @radius = @diameter / 2
         @radiusE = @radius + 2  # radius plus epsilon (launch radius)
         @radiusSquared = @radius * @radius
-        @orbitSpeed = (@orbitalDistance * 2 * Math.PI) / @orbitalPeriod * 1000
+        @orbitSpeed = (@orbitalDistance * 2 * Math.PI) / @orbitalPeriod
         @velocity = new Phaser.Point
         @center = new Phaser.Point
         @angularVelocity = Math.PI * 2 / @orbitalPeriod
@@ -35,21 +35,21 @@ planetData = [
     # 0 venus
     {
         diameter: 12
-        orbitalPeriod: 20000
+        orbitalPeriod: 20
         orbitalDistance: 80
         gravity: 10000
     }
     # 1 mars
     {
         diameter: 15
-        orbitalPeriod: 12000
+        orbitalPeriod: 12
         orbitalDistance: 150
         gravity: 10000
     }
     # 2 earth
     {
         diameter: 20
-        orbitalPeriod: 10000
+        orbitalPeriod: 10
         orbitalDistance: 100
         gravity: 10000
     }
@@ -65,7 +65,7 @@ if false
     for i in [1..10]
         planetData.push
             diameter: Math.random() * 25 + 5
-            orbitalPeriod: Math.random() * 10000 + 1000
+            orbitalPeriod: Math.random() * 10 + 1
             orbitalDistance: Math.random() * 90
 
 class GameState
@@ -89,12 +89,13 @@ class GameState
         for planet in @planets
             planet.createSprite(@game)
 
+        @startTime = @game.time.now  # ms
         return
 
     update: ->
         now = @game.time.now
         for planet in @planets
-            planet.setTime(now)
+            planet.setTime((now - @startTime) / 1000)
 
         for planet in @planets
             if planet.emitter
