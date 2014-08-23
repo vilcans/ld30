@@ -35,21 +35,21 @@ planetData = [
     # 0 venus
     {
         diameter: 12
-        orbitalPeriod: 20
+        orbitalPeriod: 200
         orbitalDistance: 80
         gravity: 10000
     }
     # 1 mars
     {
         diameter: 15
-        orbitalPeriod: 12
+        orbitalPeriod: 120
         orbitalDistance: 150
         gravity: 10000
     }
     # 2 earth
     {
         diameter: 20
-        orbitalPeriod: 10
+        orbitalPeriod: 100
         orbitalDistance: 100
         gravity: 10000
     }
