@@ -39,18 +39,18 @@ planetData = [
         orbitalDistance: 80
         gravity: 10000
     }
-    # 1 earth
-    {
-        diameter: 20
-        orbitalPeriod: 10000
-        orbitalDistance: 100
-        gravity: 10000
-    }
-    # 2 mars
+    # 1 mars
     {
         diameter: 15
         orbitalPeriod: 12000
         orbitalDistance: 150
+        gravity: 10000
+    }
+    # 2 earth
+    {
+        diameter: 20
+        orbitalPeriod: 10000
+        orbitalDistance: 100
         gravity: 10000
     }
     # 3 sun
@@ -71,6 +71,7 @@ if false
 class GameState
     preload: ->
         @game.load.image('projectile0', 'assets/baby.png')
+        @game.load.image('projectile1', 'assets/sperm.png')
 
     create: ->
         @game.world.setBounds(-1000, -1000, 2000, 2000)
@@ -81,7 +82,7 @@ class GameState
             planet.createSprite(@game)
             planet
 
-        for i in [0]
+        for i in [0, 1]
             emitter = @game.add.emitter(0, 0, 1000)
             emitter.gravity = 0
             emitter.makeParticles("projectile#{i}")
