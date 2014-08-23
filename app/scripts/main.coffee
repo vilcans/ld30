@@ -1,5 +1,9 @@
+tweaks = {
+    yearLength: 10
+}
+
 class Planet
-    constructor: ({gravity, @diameter, @orbitalPeriod, @orbitalDistance, @launchPeriod, @launchSpeed, @orbitPhase}) ->
+    constructor: ({gravity, @diameter, @orbitalPeriod, @orbitalDistance, @launchPeriod, @launchSpeed, @orbitPhase, @population}) ->
         @gravity = gravity or 0
         @radius = @diameter / 2
         @orbitPhase ?= 0
@@ -80,6 +84,7 @@ planetData = [
         gravity: 1e5
         launchPeriod: 1000
         launchSpeed: 250
+        population: new Population
     }
     # 1 mars
     {
@@ -90,12 +95,13 @@ planetData = [
         gravity: 1e5
         launchPeriod: 20
         launchSpeed: 200
+        population: new Population
     }
     # 2 earth
     {
         diameter: 20
-        orbitPhase: Math.PI
-        orbitalPeriod: 100
+        orbitPhase: Math.PI / 2
+        orbitalPeriod: tweaks.yearLength
         orbitalDistance: 100
         gravity: 1e5
     }
@@ -152,13 +158,21 @@ class GameState
         for planet in @planets
             planet.createSprite(@game)
 
+        @populationView0 = new PopulationView(@game, @planets[0].population)
+
         @startTime = @game.time.now  # ms
+        @year = 0
         return
 
     update: ->
-        now = @game.time.now
+        gameTime = (@game.time.now - @startTime) / 1000
         for planet in @planets
-            planet.setTime((now - @startTime) / 1000)
+            planet.setTime(gameTime)
+        newYear = Math.floor(gameTime / tweaks.yearLength)
+        if newYear != @year
+            @planets[0].population.advanceYear()
+            @planets[1].population.advanceYear()
+            @year = newYear
 
         for planet in @planets
             if planet.emitter
@@ -175,6 +189,7 @@ class GameState
 
             planet.setDirection(@game.input.worldX, @game.input.worldY)
 
+        @populationView0.update()
         return
 
     updateGravity: (particle) ->
@@ -185,6 +200,8 @@ class GameState
             dy = particle.y - planet.center.y
             distanceSquared = dx * dx + dy * dy
             if distanceSquared < planet.radiusSquared
+                if planet.population
+                    planet.population.addBabies(1)
                 particle.kill()
                 return
             distance = Math.sqrt(distanceSquared)
