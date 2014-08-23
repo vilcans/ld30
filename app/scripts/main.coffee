@@ -9,6 +9,8 @@ class Planet
         @center = new Phaser.Point
         @angularVelocity = Math.PI * 2 / @orbitalPeriod
 
+        @launcherAngle = 0
+
     setTime: (t) ->
         angle = @angularVelocity * t
         sin = Math.sin(angle)
@@ -30,6 +32,10 @@ class Planet
 
         @sprite = game.add.sprite(@center.x, @center.y, bmd)
         @sprite.anchor.set .5, .5
+
+    # Point the launcher at a world coordinate
+    setDirection: (x, y) ->
+        @launcherAngle = Phaser.Math.angleBetween(@center.x, @center.y, x, y)
 
 planetData = [
     # 0 venus
@@ -99,7 +105,7 @@ class GameState
 
         for planet in @planets
             if planet.emitter
-                angle = 0
+                angle = planet.launcherAngle
                 sin = Math.sin(angle)
                 cos = Math.cos(angle)
                 xspeed = cos * 100 + planet.velocity.x
@@ -109,6 +115,8 @@ class GameState
                 planet.emitter.emitX = planet.center.x + planet.radiusE * cos
                 planet.emitter.emitY = planet.center.y + planet.radiusE * sin
                 planet.emitter.forEachExists(@updateGravity, this)
+
+        @planets[1].setDirection(@game.input.worldX, @game.input.worldY)
 
         return
 
