@@ -1,5 +1,5 @@
 class Planet
-    constructor: ({gravity, @diameter, @orbitalPeriod, @orbitalDistance}) ->
+    constructor: ({gravity, @diameter, @orbitalPeriod, @orbitalDistance, @launchPeriod}) ->
         @gravity = gravity or 0
         @radius = @diameter / 2
         @radiusE = @radius + 2  # radius plus epsilon (launch radius)
@@ -10,6 +10,7 @@ class Planet
         @angularVelocity = Math.PI * 2 / @orbitalPeriod
 
         @launcherAngle = 0
+        @emitting = false
 
     setTime: (t) ->
         angle = @angularVelocity * t
@@ -37,6 +38,18 @@ class Planet
     setDirection: (x, y) ->
         @launcherAngle = Phaser.Math.angleBetween(@center.x, @center.y, x, y)
 
+    startEmitting: ->
+        if @emitting
+            return
+        @emitter.start(false, 20000, @launchPeriod, 0)
+        @emitting = true
+
+    stopEmitting: ->
+        if not @emitting
+            return
+        @emitter.start(false, 0, 1e9)  # stop it
+        @emitting = false
+
 planetData = [
     # 0 venus
     {
@@ -44,6 +57,7 @@ planetData = [
         orbitalPeriod: 200
         orbitalDistance: 80
         gravity: 10000
+        launchPeriod: 1000
     }
     # 1 mars
     {
@@ -51,6 +65,7 @@ planetData = [
         orbitalPeriod: 120
         orbitalDistance: 150
         gravity: 10000
+        launchPeriod: 20
     }
     # 2 earth
     {
@@ -89,8 +104,18 @@ class GameState
             emitter = @game.add.emitter(0, 0, 1000)
             emitter.gravity = 0
             emitter.makeParticles("projectile#{i}")
-            emitter.start(false, 20000, (if i == 0 then 1000 else 10), 0)
             @planets[i].emitter = emitter
+            if i == 0
+                @planets[i].startEmitting()
+
+        @game.input.onDown.add(
+            -> @planets[1].startEmitting()
+            this
+        )
+        @game.input.onUp.add(
+            -> @planets[1].stopEmitting()
+            this
+        )
 
         for planet in @planets
             planet.createSprite(@game)
