@@ -3,8 +3,7 @@
   "private": true,
   "dependencies": {
     "jquery": "~1.11.0",
-    "phaser-official": "~2.0.3",
-    "phaser": "~2.0.7"
+    "phaser-official": "2.0.7"
   },
   "devDependencies": {}
 }
