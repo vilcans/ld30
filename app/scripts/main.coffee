@@ -22,32 +22,53 @@ class Planet
         @sprite.anchor.set .5, .5
 
 planets = [
+    # 0 venus
     new Planet(
-        diameter: 30
+        diameter: 12
+        orbitalPeriod: 7000
+        orbitalDistance: 80
+    )
+    # 1 earth
+    new Planet(
+        diameter: 20
         orbitalPeriod: 10000
-        orbitalDistance: 30
+        orbitalDistance: 100
+    )
+    # 2 mars
+    new Planet(
+        diameter: 15
+        orbitalPeriod: 12000
+        orbitalDistance: 150
+    )
+    # 3 sun
+    new Planet(
+        diameter: 60
+        orbitalPeriod: 1
+        orbitalDistance: 0
     )
 ]
-for i in [1..10]
-    planets.push new Planet(
-        diameter: Math.random() * 25 + 5
-        orbitalPeriod: Math.random() * 10000 + 1000
-        orbitalDistance: Math.random() * 90
-    )
+if false
+    for i in [1..10]
+        planets.push new Planet(
+            diameter: Math.random() * 25 + 5
+            orbitalPeriod: Math.random() * 10000 + 1000
+            orbitalDistance: Math.random() * 90
+        )
 
 class GameState
     preload: ->
 
     create: ->
         @game.world.setBounds(-1000, -1000, 2000, 2000)
+        @game.world.camera.focusOnXY(0, 0)
         for planet in planets
             planet.createSprite(@game)
         return
 
     update: ->
-        @game.world.camera.focusOnXY(0, 0)
+        now = @game.time.now
         for planet in planets
-            planet.setTime(@game.time.now)
+            planet.setTime(now)
 
         return
 
