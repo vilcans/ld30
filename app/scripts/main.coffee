@@ -12,6 +12,8 @@ class Planet
         @launcherAngle = 0
         @emitting = false
 
+        @selectedWithPointer = null
+
     setTime: (t) ->
         angle = @angularVelocity * t
         sin = Math.sin(angle)
@@ -34,6 +36,8 @@ class Planet
         @sprite = game.add.sprite(@center.x, @center.y, bmd)
         @sprite.anchor.set .5, .5
 
+        @sprite.inputEnabled = true
+
     # Point the launcher at a world coordinate
     setDirection: (x, y) ->
         @launcherAngle = Phaser.Math.angleBetween(@center.x, @center.y, x, y)
@@ -49,6 +53,21 @@ class Planet
             return
         @emitter.start(false, 0, 1e9)  # stop it
         @emitting = false
+
+    select: (pointer) ->
+        @selectedWithPointer = pointer
+        @startEmitting()
+
+    deselect: (pointerId) ->
+        if not @selectedWithPointer
+            return
+        if @selectedWithPointer.id != pointerId
+            return
+        #@selectedSprite.visible = true
+        @selectedWithPointer = null
+        @stopEmitting()
+
+    isSelected: -> @selectedWithPointerId != null
 
 planetData = [
     # 0 venus
@@ -107,15 +126,22 @@ class GameState
             emitter.gravity = 0
             emitter.makeParticles("projectile#{i}")
             @planets[i].emitter = emitter
-            if i == 0
-                @planets[i].startEmitting()
 
         @game.input.onDown.add(
-            -> @planets[1].startEmitting()
+            (pointer, event) ->
+                for planet in @planets
+                    if planet.emitter and not planet.emitting and planet.sprite.input.pointerOver(pointer.id)
+                        console.log 'selecting', planet
+                        planet.select(pointer)
+                        break
+                return
             this
         )
         @game.input.onUp.add(
-            -> @planets[1].stopEmitting()
+            (pointer, event) ->
+                for planet in @planets
+                    planet.deselect(pointer.id)
+                return
             this
         )
 
@@ -143,7 +169,7 @@ class GameState
                 planet.emitter.emitY = planet.center.y + planet.radiusE * sin
                 planet.emitter.forEachExists(@updateGravity, this)
 
-        @planets[1].setDirection(@game.input.worldX, @game.input.worldY)
+            planet.setDirection(@game.input.worldX, @game.input.worldY)
 
         return
 
