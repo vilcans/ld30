@@ -1,7 +1,8 @@
 class Planet
-    constructor: ({gravity, @diameter, @orbitalPeriod, @orbitalDistance, @launchPeriod, @launchSpeed}) ->
+    constructor: ({gravity, @diameter, @orbitalPeriod, @orbitalDistance, @launchPeriod, @launchSpeed, @orbitPhase}) ->
         @gravity = gravity or 0
         @radius = @diameter / 2
+        @orbitPhase ?= 0
         @radiusE = @radius + 2  # radius plus epsilon (launch radius)
         @radiusSquared = @radius * @radius
         @orbitSpeed = (@orbitalDistance * 2 * Math.PI) / @orbitalPeriod
@@ -15,7 +16,7 @@ class Planet
         @selectedWithPointer = null
 
     setTime: (t) ->
-        angle = @angularVelocity * t
+        angle = @angularVelocity * t + @orbitPhase
         sin = Math.sin(angle)
         cos = Math.cos(angle)
         @sprite.x = @center.x = cos * @orbitalDistance
@@ -75,15 +76,17 @@ planetData = [
         diameter: 12
         orbitalPeriod: 200
         orbitalDistance: 80
+        orbitPhase: .3
         gravity: 1e5
         launchPeriod: 1000
-        launchSpeed: 200
+        launchSpeed: 250
     }
     # 1 mars
     {
         diameter: 15
         orbitalPeriod: 120
         orbitalDistance: 150
+        orbitPhase: 0
         gravity: 1e5
         launchPeriod: 20
         launchSpeed: 200
@@ -91,6 +94,7 @@ planetData = [
     # 2 earth
     {
         diameter: 20
+        orbitPhase: Math.PI
         orbitalPeriod: 100
         orbitalDistance: 100
         gravity: 1e5
