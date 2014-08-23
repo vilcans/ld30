@@ -1,5 +1,6 @@
 class Planet
     constructor: ({@diameter, @orbitalPeriod, @orbitalDistance}) ->
+        @radius = @diameter / 2
         @center = new Phaser.Point
         @angularVelocity = Math.PI * 2 / @orbitalPeriod
 
@@ -9,51 +10,49 @@ class Planet
         @sprite.y = @center.y = Math.cos(angle) * @orbitalDistance
 
     createSprite: (game) ->
-        radius = @diameter / 2
         bmd = game.add.bitmapData(@diameter, @diameter)
 
         bmd.ctx.fillStyle = '#999999'
         bmd.ctx.beginPath()
-        bmd.ctx.arc(radius, radius, radius, 0, Math.PI * 2, true)
+        bmd.ctx.arc(@radius, @radius, @radius, 0, Math.PI * 2, true)
         bmd.ctx.closePath()
         bmd.ctx.fill()
 
         @sprite = game.add.sprite(@center.x, @center.y, bmd)
         @sprite.anchor.set .5, .5
 
-planets = [
+planetData = [
     # 0 venus
-    new Planet(
+    {
         diameter: 12
         orbitalPeriod: 7000
         orbitalDistance: 80
-    )
+    }
     # 1 earth
-    new Planet(
+    {
         diameter: 20
         orbitalPeriod: 10000
         orbitalDistance: 100
-    )
+    }
     # 2 mars
-    new Planet(
+    {
         diameter: 15
         orbitalPeriod: 12000
         orbitalDistance: 150
-    )
+    }
     # 3 sun
-    new Planet(
+    {
         diameter: 60
         orbitalPeriod: 1
         orbitalDistance: 0
-    )
+    }
 ]
 if false
     for i in [1..10]
-        planets.push new Planet(
+        planetData.push
             diameter: Math.random() * 25 + 5
             orbitalPeriod: Math.random() * 10000 + 1000
             orbitalDistance: Math.random() * 90
-        )
 
 class GameState
     preload: ->
@@ -61,13 +60,16 @@ class GameState
     create: ->
         @game.world.setBounds(-1000, -1000, 2000, 2000)
         @game.world.camera.focusOnXY(0, 0)
-        for planet in planets
+
+        @planets = for data in planetData
+            planet = new Planet(data)
             planet.createSprite(@game)
+            planet
         return
 
     update: ->
         now = @game.time.now
-        for planet in planets
+        for planet in @planets
             planet.setTime(now)
 
         return
