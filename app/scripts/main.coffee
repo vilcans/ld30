@@ -1,13 +1,23 @@
 class Planet
-    constructor: ({@diameter, @orbitalPeriod, @orbitalDistance}) ->
+    constructor: ({gravity, @diameter, @orbitalPeriod, @orbitalDistance}) ->
+        @gravity = gravity or 0
         @radius = @diameter / 2
+        @radiusE = @radius + 1  # radius plus epsilon (launch radius)
+        @radiusSquared = @radius * @radius
+        @orbitSpeed = (@orbitalDistance * Math.PI) / @orbitalPeriod * 1000
+        @velocity = new Phaser.Point
         @center = new Phaser.Point
         @angularVelocity = Math.PI * 2 / @orbitalPeriod
 
     setTime: (t) ->
         angle = @angularVelocity * t
-        @sprite.x = @center.x = Math.sin(angle) * @orbitalDistance
-        @sprite.y = @center.y = Math.cos(angle) * @orbitalDistance
+        sin = Math.sin(angle)
+        cos = Math.cos(angle)
+        @sprite.x = @center.x = cos * @orbitalDistance
+        @sprite.y = @center.y = -sin * @orbitalDistance
+        @velocity.x = -sin * @orbitSpeed
+        @velocity.y = -cos * @orbitSpeed
+        return
 
     createSprite: (game) ->
         bmd = game.add.bitmapData(@diameter, @diameter)
@@ -25,26 +35,30 @@ planetData = [
     # 0 venus
     {
         diameter: 12
-        orbitalPeriod: 7000
+        orbitalPeriod: 20000
         orbitalDistance: 80
+        gravity: 10000
     }
     # 1 earth
     {
         diameter: 20
         orbitalPeriod: 10000
         orbitalDistance: 100
+        gravity: 10000
     }
     # 2 mars
     {
         diameter: 15
         orbitalPeriod: 12000
         orbitalDistance: 150
+        gravity: 10000
     }
     # 3 sun
     {
         diameter: 60
         orbitalPeriod: 1
         orbitalDistance: 0
+        gravity: 1000000
     }
 ]
 if false
@@ -56,6 +70,7 @@ if false
 
 class GameState
     preload: ->
+        @game.load.image('projectile0', 'assets/baby.png')
 
     create: ->
         @game.world.setBounds(-1000, -1000, 2000, 2000)
@@ -65,6 +80,14 @@ class GameState
             planet = new Planet(data)
             planet.createSprite(@game)
             planet
+
+        for i in [0]
+            emitter = @game.add.emitter(0, 0, 1000)
+            emitter.gravity = 0
+            emitter.makeParticles("projectile#{i}")
+            emitter.start(false, 20000, 10, 0)
+            @planets[i].emitter = emitter
+
         return
 
     update: ->
@@ -72,7 +95,47 @@ class GameState
         for planet in @planets
             planet.setTime(now)
 
+            if planet.emitter
+                angle = 0
+                sin = Math.sin(angle)
+                cos = Math.cos(angle)
+                xspeed = cos * 100 + planet.velocity.x
+                yspeed = sin * 100 + planet.velocity.y
+                planet.emitter.setXSpeed(xspeed, xspeed)
+                planet.emitter.setYSpeed(yspeed, yspeed)
+                planet.emitter.emitX = planet.center.x + xspeed / 1000 + planet.radiusE * cos
+                planet.emitter.emitY = planet.center.y + yspeed / 1000 + planet.radiusE * sin
+                planet.emitter.forEachExists(@updateGravity, this)
+
+            if planet.emitter
+                angle = 0
+                sin = Math.sin(angle)
+                cos = Math.cos(angle)
+                xspeed = cos * 100 + planet.velocity.x
+                yspeed = sin * 100 + planet.velocity.y
+                planet.emitter.setXSpeed(xspeed, xspeed)
+                planet.emitter.setYSpeed(yspeed, yspeed)
+                planet.emitter.emitX = planet.center.x + xspeed / 1000 + planet.radiusE * cos
+                planet.emitter.emitY = planet.center.y + yspeed / 1000 + planet.radiusE * sin
+                planet.emitter.forEachExists(@updateGravity, this)
+
         return
+
+    updateGravity: (particle) ->
+        g = particle.body.gravity
+        g.x = g.y = 0
+        for planet in @planets
+            dx = particle.x - planet.center.x
+            dy = particle.y - planet.center.y
+            distanceSquared = dx * dx + dy * dy
+            if distanceSquared < planet.radiusSquared
+                particle.kill()
+                return
+            distance = Math.sqrt(distanceSquared)
+            dxNorm = dx / distance
+            dyNorm = dy / distance
+            g.x -= dxNorm * planet.gravity / distanceSquared
+            g.y -= dyNorm * planet.gravity / distanceSquared
 
 class MenuState
     preload: ->
