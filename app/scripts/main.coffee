@@ -4,7 +4,7 @@ class MainState
     create: ->
         t = @game.add.text(
             @game.width / 2, 0,
-            'Welcome',
+            'Welcome to Ludum Dare 30',
             style = { font: '32px Arial', fill: '#8800ff', align: 'center' }
         )
         t.anchor.set(.5, 0)
