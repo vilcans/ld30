@@ -108,18 +108,6 @@ class GameState
                 planet.emitter.emitY = planet.center.y + planet.radiusE * sin
                 planet.emitter.forEachExists(@updateGravity, this)
 
-            if planet.emitter
-                angle = 0
-                sin = Math.sin(angle)
-                cos = Math.cos(angle)
-                xspeed = cos * 100 + planet.velocity.x
-                yspeed = sin * 100 + planet.velocity.y
-                planet.emitter.setXSpeed(xspeed, xspeed)
-                planet.emitter.setYSpeed(yspeed, yspeed)
-                planet.emitter.emitX = planet.center.x + xspeed / 1000 + planet.radiusE * cos
-                planet.emitter.emitY = planet.center.y + yspeed / 1000 + planet.radiusE * sin
-                planet.emitter.forEachExists(@updateGravity, this)
-
         return
 
     updateGravity: (particle) ->
