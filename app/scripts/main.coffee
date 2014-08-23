@@ -77,10 +77,7 @@ class GameState
         @game.world.setBounds(-1000, -1000, 2000, 2000)
         @game.world.camera.focusOnXY(0, 0)
 
-        @planets = for data in planetData
-            planet = new Planet(data)
-            planet.createSprite(@game)
-            planet
+        @planets = (new Planet(data) for data in planetData)
 
         for i in [0, 1]
             emitter = @game.add.emitter(0, 0, 1000)
@@ -88,6 +85,9 @@ class GameState
             emitter.makeParticles("projectile#{i}")
             emitter.start(false, 20000, 10, 0)
             @planets[i].emitter = emitter
+
+        for planet in @planets
+            planet.createSprite(@game)
 
         return
 
