@@ -83,7 +83,7 @@ class GameState
             emitter = @game.add.emitter(0, 0, 1000)
             emitter.gravity = 0
             emitter.makeParticles("projectile#{i}")
-            emitter.start(false, 20000, 10, 0)
+            emitter.start(false, 20000, (if i == 0 then 1000 else 10), 0)
             @planets[i].emitter = emitter
 
         for planet in @planets
@@ -96,6 +96,7 @@ class GameState
         for planet in @planets
             planet.setTime(now)
 
+        for planet in @planets
             if planet.emitter
                 angle = 0
                 sin = Math.sin(angle)
