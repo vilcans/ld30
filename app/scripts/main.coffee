@@ -2,9 +2,9 @@ class Planet
     constructor: ({gravity, @diameter, @orbitalPeriod, @orbitalDistance}) ->
         @gravity = gravity or 0
         @radius = @diameter / 2
-        @radiusE = @radius + 1  # radius plus epsilon (launch radius)
+        @radiusE = @radius + 2  # radius plus epsilon (launch radius)
         @radiusSquared = @radius * @radius
-        @orbitSpeed = (@orbitalDistance * Math.PI) / @orbitalPeriod * 1000
+        @orbitSpeed = (@orbitalDistance * 2 * Math.PI) / @orbitalPeriod * 1000
         @velocity = new Phaser.Point
         @center = new Phaser.Point
         @angularVelocity = Math.PI * 2 / @orbitalPeriod
@@ -104,8 +104,8 @@ class GameState
                 yspeed = sin * 100 + planet.velocity.y
                 planet.emitter.setXSpeed(xspeed, xspeed)
                 planet.emitter.setYSpeed(yspeed, yspeed)
-                planet.emitter.emitX = planet.center.x + xspeed / 1000 + planet.radiusE * cos
-                planet.emitter.emitY = planet.center.y + yspeed / 1000 + planet.radiusE * sin
+                planet.emitter.emitX = planet.center.x + planet.radiusE * cos
+                planet.emitter.emitY = planet.center.y + planet.radiusE * sin
                 planet.emitter.forEachExists(@updateGravity, this)
 
             if planet.emitter
