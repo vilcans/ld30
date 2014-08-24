@@ -2,7 +2,7 @@ tweaks = {
     tickLength: 100  # ms
     yearLength: 20
     babiesInProjectile: 5000
-    babiesPerSperm: 250
+    babiesPerSperm: 100
     babyProbability: 1
     # Number of sperms produced per man per tick
     maleFertility: .0001
