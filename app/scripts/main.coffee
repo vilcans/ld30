@@ -1,8 +1,40 @@
 tweaks = {
     yearLength: 10
+    babiesInProjectile: 100
+    babyProbability: .01
 }
 
+class ProjectileEmitter extends Phaser.Particles.Arcade.Emitter
+    constructor: (@planet, game, maxParticles) ->
+        super(game, 0, 0, maxParticles)
+
+    # overrides Emitter
+    emitParticle: ->
+        if not @planet.population.hasProjectiles()
+            return
+        @planet.population.decreaseProjectiles(1)
+        super()
+
+class Sperm extends Phaser.Particle
+    receiveByVenus: (venus) ->
+        if venus.rnd.frac() < .5
+            venus.population.addBabies(1)
+        else
+            venus.population.projectiles += 1
+    receiveByMars: (mars) ->
+        # wasted
+
+class Baby extends Phaser.Particle
+    receiveByVenus: (venus) ->
+        # returned to Venus
+        venus.population.addBabies(tweaks.babiesInProjectile)
+    receiveByMars: (mars) ->
+        mars.population.addBabies(tweaks.babiesInProjectile)
+
 class Planet
+    # for overriding
+    particleClass: Phaser.Particle
+
     constructor: (@id, {gravity, @diameter, @orbitalPeriod, @orbitalDistance, @launchPeriod, @launchSpeed, @orbitPhase, @population}) ->
         @gravity = gravity or 0
         @radius = @diameter / 2
@@ -43,8 +75,10 @@ class Planet
 
         @sprite.inputEnabled = true
 
-    addEmitter: (game, launchPeriod) ->
-        emitter = game.add.emitter(0, 0, launchPeriod)
+    addEmitter: (game, maxParticles) ->
+        emitter = new ProjectileEmitter(this, game, maxParticles)
+        emitter.particleClass = @particleClass
+        game.particles.add(emitter)
         emitter.gravity = 0
         emitter.makeParticles("projectile#{@id}")
         @emitter = emitter
@@ -54,7 +88,7 @@ class Planet
         @launcherAngle = Phaser.Math.angleBetween(@center.x, @center.y, x, y)
 
     startEmitting: ->
-        if @emitting
+        if @emitting or not @population.hasProjectiles()
             return
         @emitter.start(false, 20000, @launchPeriod, 0)
         @emitting = true
@@ -82,6 +116,8 @@ class Planet
 
     update: (gameState) ->
         if @emitter
+            if @emitting and not @population.hasProjectiles()
+                @stopEmitting()
             angle = @launcherAngle
             sin = Math.sin(angle)
             cos = Math.cos(angle)
@@ -93,9 +129,29 @@ class Planet
             @emitter.emitY = @center.y + @radiusE * sin
             @emitter.forEachExists(gameState.updateGravity, gameState)
 
+    # for overriding
+    receiveProjectile: (particle) ->
+
+class Venus extends Planet
+    particleClass: Baby
+    constructor: (args...) ->
+        super(args...)
+        @rnd = new Phaser.RandomDataGenerator
+    receiveProjectile: (particle) ->
+        console.log 'Venus received', particle
+        particle.receiveByVenus(this)
+
+class Mars extends Planet
+    particleClass: Sperm
+    receiveProjectile: (particle) ->
+        console.log 'Mars received', particle
+        particle.receiveByMars(this)
+
+
 planetData = [
     # 0 venus
     {
+        class: Venus
         diameter: 12
         orbitalPeriod: 200
         orbitalDistance: 80
@@ -107,6 +163,7 @@ planetData = [
     }
     # 1 mars
     {
+        class: Mars
         diameter: 15
         orbitalPeriod: 120
         orbitalDistance: 150
@@ -148,8 +205,8 @@ class GameState
         @game.world.setBounds(-1000, -1000, 2000, 2000)
         @game.world.camera.focusOnXY(0, 0)
 
-        @planets = (new Planet(i, data) for data, i in planetData)
-        @planets[0].addEmitter(@game, 10)
+        @planets = (new (data.class or Planet)(i, data) for data, i in planetData)
+        @planets[0].addEmitter(@game, 1000)
         @planets[1].addEmitter(@game, 1000)
 
         @game.input.onDown.add(
@@ -172,7 +229,8 @@ class GameState
         for planet in @planets
             planet.createSprite(@game)
 
-        @populationView0 = new PopulationView(@game, @planets[0].population)
+        @populationView0 = new PopulationView(@game, @planets[0].population, 5)
+        @populationView1 = new PopulationView(@game, @planets[1].population, @game.width - 120)
 
         @startTime = @game.time.now  # ms
         @year = 0
@@ -193,6 +251,7 @@ class GameState
             planet.update(this)
 
         @populationView0.update()
+        @populationView1.update()
         return
 
     updateGravity: (particle) ->
@@ -203,8 +262,7 @@ class GameState
             dy = particle.y - planet.center.y
             distanceSquared = dx * dx + dy * dy
             if distanceSquared < planet.radiusSquared
-                if planet.population
-                    planet.population.addBabies(1)
+                planet.receiveProjectile(particle)
                 particle.kill()
                 return
             distance = Math.sqrt(distanceSquared)
