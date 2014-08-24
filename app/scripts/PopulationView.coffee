@@ -1,7 +1,7 @@
 textSize = 16
 
 class @PopulationView
-    constructor: (@game, @population, x) ->
+    constructor: (@game, @population, heading, x) ->
         @texts = []
         style = { font: "#{textSize}px Arial", fill: '#8800ff' }
         y = @game.height - textSize
@@ -12,7 +12,7 @@ class @PopulationView
             @texts[i].fixedToCamera = true
             y -= textSize
 
-        text = @game.add.text(x, y, 'Population', style)
+        text = @game.add.text(x, y, heading, style)
         text.fixedToCamera = true
 
     update: ->

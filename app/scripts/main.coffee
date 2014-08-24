@@ -300,9 +300,9 @@ class GameState
         for planet in @planets
             planet.createSprite(@game)
 
-        @populationView0 = new PopulationView(@game, @planets[0].females, 5)
-        @populationView0b = new PopulationView(@game, @planets[0].males, 100)
-        @populationView1 = new PopulationView(@game, @planets[1].males, @game.width - 120)
+        @populationView0 = new PopulationView(@game, @planets[0].females, 'Females on Venus (age groups)', 5)
+        @populationView0b = new PopulationView(@game, @planets[0].males, 'Males on Venus (age groups)', 100)
+        @populationView1 = new PopulationView(@game, @planets[1].males, 'Males on Mars (age groups)', @game.width - 220)
 
         @startTime = @game.time.now  # ms
         @year = 0
