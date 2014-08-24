@@ -1,6 +1,6 @@
 tweaks = {
     tickLength: 100  # ms
-    yearLength: 30
+    yearLength: 20
     babiesInProjectile: 25
     babyProbability: .01
     # Min. number of available mothers for babyProbability to apply
