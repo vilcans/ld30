@@ -4,20 +4,23 @@ lineThickness = 6
 
 pyramidScale = 400 / 60000
 
+debug = false
+
 class @PopulationView
     constructor: (@game, @population, @secondary, heading, x, @colors, @right) ->
-        @texts = []
-        style = { font: "#{textSize}px Arial", fill: '#8800ff' }
-        y = @game.height - textSize * 2
+        if debug
+            @texts = []
+            style = { font: "#{textSize}px Arial", fill: '#8800ff' }
+            y = @game.height - textSize * 2
 
-        for i in [0...@population.numberOfAges]
-            c = @population.getPopulationForAge(i)
-            @texts[i] = @game.add.text(x, y, "#{c}", style)
-            @texts[i].fixedToCamera = true
-            y -= textSize
+            for i in [0...@population.numberOfAges]
+                c = @population.getPopulationForAge(i)
+                @texts[i] = @game.add.text(x, y, "#{c}", style)
+                @texts[i].fixedToCamera = true
+                y -= textSize
 
-        text = @game.add.text(x, y, heading, style)
-        text.fixedToCamera = true
+            text = @game.add.text(x, y, heading, style)
+            text.fixedToCamera = true
 
         @graphics = @game.add.graphics(0, 0)
         @graphics.fixedToCamera = true
@@ -30,7 +33,8 @@ class @PopulationView
     update: ->
         for i in [0...@population.numberOfAges]
             c = @population.getPopulationForAge(i)
-            @texts[i].text = c
+            if debug
+                @texts[i].text = c
             width = c * pyramidScale
             @primaryWidths[i] = width
 
