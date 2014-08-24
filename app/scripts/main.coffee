@@ -257,7 +257,7 @@ planetData = [
         gravity: 2e5
         launchPeriod: 10
         launchSpeed: 200 * 2
-        launchJitter: 2
+        launchJitter: 10
     }
     # mercury
     {
