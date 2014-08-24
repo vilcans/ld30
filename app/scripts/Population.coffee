@@ -15,8 +15,9 @@ class @Population
 
     getFertilePopulation: ->
         s = 0
-        for i in [@fertilityAge...@numberOfAges]
-            s += @agePyramid[i]
+        i = @fertilityAge
+        while i < @numberOfAges
+            s += @agePyramid[i++]
         return s
 
     getTotal: ->

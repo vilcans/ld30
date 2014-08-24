@@ -316,6 +316,7 @@ class GameState
         @game.load.audio('music', ['assets/LD30.ogg'])
 
     create: ->
+        @gameOn = true
         @sounds = {
             sperm: @game.add.audio('sperm', .3, true)
             baby: @game.add.audio('baby', .5, false)
@@ -374,6 +375,8 @@ class GameState
                 @planets[0].females.randomKills()
                 @planets[1].males.randomKills()
                 @podView.text = "Baby Pods ready for launch: #{@planets[0].podCount}"
+                if @planets[0].females.getFertilePopulation() == 0 or @planets[1].males.getFertilePopulation() == 0
+                    @setGameOver()
             this
         )
         @tickTimer.start()
@@ -384,11 +387,60 @@ class GameState
 
         return
 
+    setGameOver: ->
+        @populationView0.update()
+        @populationView0b.update()
+        @populationView1.update()
+
+        @gameOn = false
+        @sounds.music.stop()
+        @tickTimer.stop()
+        t = @game.add.text(
+            @game.width / 2, @game.height / 2,
+            'GAME\n\nOVER',
+            style = { font: '80px Arial', fill: '#ffffff', align: 'center' }
+        )
+        t.anchor.set(.5, .5)
+        t.fixedToCamera = true
+
+        t = @game.add.text(
+            @game.width / 2, @game.height - 140,
+            'Humankind is doomed',
+            style = { font: '32px Arial', fill: '#888888', align: 'center' }
+        )
+        t.anchor.set(.5, .5)
+        t.fixedToCamera = true
+
+        t = @game.add.text(
+            @game.width / 2, @game.height - 140,
+            'Humankind is doomed',
+            style = { font: '32px Arial', fill: '#888888', align: 'center' }
+        )
+        t.anchor.set(.5, .5)
+        t.fixedToCamera = true
+
+        @restartButton = @game.add.text(
+            @game.width / 2, @game.height - 64,
+            'Restart',
+            style = { font: 'bold 32px Arial', fill: '#888888', align: 'center' }
+        )
+        @restartButton.fixedToCamera = true
+        @restartButton.anchor.set(.5, 1)
+        @restartButton.inputEnabled = true
+        @restartButton.events.onInputDown.add(
+            (object, pointer) ->
+                @game.state.start('menu')
+            this
+        )
+
     getDateText: ->
         month = Math.floor(@gameTime % (tweaks.yearLength * 12)) % 12
         return "#{monthNames[@month]} #{@year + 2100}"
 
     update: ->
+        if not @gameOn
+            return
+
         @gameTime = @game.time.elapsedSecondsSince(@startTime)
         for planet in @planets
             planet.setTime(@gameTime)
@@ -433,11 +485,24 @@ class MenuState
 
     create: ->
         t = @game.add.text(
-            @game.width / 2, 0,
-            'Welcome to Ludum Dare 30',
-            style = { font: '32px Arial', fill: '#8800ff', align: 'center' }
+            @game.width / 2, 60,
+            'PANSPERMIA',
+            style = { font: '64px Arial', fill: '#ffffff', align: 'center' }
         )
         t.anchor.set(.5, 0)
+
+        @startButton = @game.add.text(
+            @game.width / 2, @game.height - 64,
+            'Start',
+            style = { font: 'bold 32px Arial', fill: '#888888', align: 'center' }
+        )
+        @startButton.anchor.set(.5, 1)
+        @startButton.inputEnabled = true
+        @startButton.events.onInputDown.add(
+            (object, pointer) ->
+                @game.state.start('game')
+            this
+        )
 
     update: ->
 
