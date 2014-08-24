@@ -166,7 +166,7 @@ class Venus extends Planet
             650 / 2,
             600 / 2,
         ])
-        @males = new Population([0, 0, 0])
+        @males = new Population([0, 0])
     receiveProjectile: (particle) ->
         particle.receiveByVenus(this)
     advanceYear: ->
