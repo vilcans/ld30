@@ -1,8 +1,8 @@
 tweaks = {
     tickLength: 100  # ms
     yearLength: 20
-    babiesInProjectile: 2500
-    babiesPerSperm: 1000
+    babiesInProjectile: 5000
+    babiesPerSperm: 500
     babyProbability: 1
     # Min. number of available mothers for babyProbability to apply
     minMothers: 400000
@@ -238,44 +238,44 @@ planetData = [
     {
         class: Venus
         color: '#b77424'
-        diameter: 30
+        diameter: 30 * 2
         orbitalPeriod: Math.round(.6 * tweaks.yearLength)
-        orbitalDistance: 107
+        orbitalDistance: 107 * 2
         orbitPhase: Math.PI
-        gravity: 1e5
+        gravity: 2e5
         launchPeriod: 500
-        launchSpeed: 250
+        launchSpeed: 250 * 2
     }
     # 1 mars
     {
         class: Mars
         color: '#d84e1e'
-        diameter: 15
+        diameter: 15 * 2
         orbitalPeriod: Math.round(1.88 * tweaks.yearLength)
-        orbitalDistance: 220
+        orbitalDistance: 330 #220 * 2
         orbitPhase: 0
-        gravity: 1e5
-        launchPeriod: 20
-        launchSpeed: 200
+        gravity: 2e5
+        launchPeriod: 10
+        launchSpeed: 200 * 2
         launchJitter: 2
     }
     # mercury
     {
         color: '#556677'
-        diameter: 12
+        diameter: 12 * 2
         orbitPhase: Math.PI * 2 * .6
         orbitalPeriod: Math.round(.24 * tweaks.yearLength)
-        orbitalDistance: 40
-        gravity: .3e5
+        orbitalDistance: 40 * 2
+        gravity: .6e5
     }
     # earth
     {
         color: '#252983'
-        diameter: 32
+        diameter: 32 * 2
         orbitPhase: Math.PI / 2
         orbitalPeriod: tweaks.yearLength
-        orbitalDistance: 150
-        gravity: 1e5
+        orbitalDistance: 280
+        gravity: 2e5
     }
     # sun
     {
@@ -283,7 +283,7 @@ planetData = [
         diameter: 60
         orbitalPeriod: 1
         orbitalDistance: 0
-        gravity: 1e6
+        gravity: 2e6
     }
 ]
 if false
@@ -417,7 +417,7 @@ class MenuState
     render: ->
 
 start = ->
-    game = new Phaser.Game(800, 600, Phaser.CANVAS, 'LD30')
+    game = new Phaser.Game(700, 700, Phaser.CANVAS, 'LD30')
     game.state.add('menu', MenuState)
     game.state.add('game', GameState)
     game.state.start('game')
