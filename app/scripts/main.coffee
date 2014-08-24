@@ -175,6 +175,7 @@ class Mars extends Planet
 
     constructor: (args...) ->
         super(args...)
+        @spermAmount = 0
         @males = new Population([
             0,
             1000,
@@ -193,18 +194,18 @@ class Mars extends Planet
 
     produceSperm: ->
         spermProduction = Math.ceil(@males.getFertilePopulation() * tweaks.maleFertility)
-        @males.projectiles += spermProduction
-        if @males.projectiles > tweaks.maxSpermBank
-            @males.projectiles = tweaks.maxSpermBank
+        @spermAmount += spermProduction
+        if @spermAmount > tweaks.maxSpermBank
+            @spermAmount = tweaks.maxSpermBank
 
     advanceYear: ->
         @males.increaseAges()
 
     canLaunch: ->
-        return @males.projectiles > 0
+        return @spermAmount > 0
 
     onLaunch: ->
-        @males.projectiles -= 1
+        @spermAmount -= 1
 
 planetData = [
     # 0 venus

@@ -2,7 +2,6 @@ class @Population
     constructor: (@agePyramid, @fertilityAge=1) ->
         @numberOfAges = @agePyramid.length
         #@mortality = 0
-        @projectiles = 0
 
     getPopulationForAge: (age) ->
         return @agePyramid[age] or 0
@@ -14,12 +13,6 @@ class @Population
 
     addBabies: (count) ->
         @agePyramid[0] += count
-
-    hasProjectiles: ->
-        return @projectiles > 0
-
-    decreaseProjectiles: (amount) ->
-        @projectiles = Math.max(0, @projectiles - amount)
 
     getFertilePopulation: ->
         s = 0
