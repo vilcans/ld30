@@ -19,6 +19,26 @@ monthNames = [
     'Janary', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'
 ]
 
+class PodView
+    constructor: (@game) ->
+        @maxPods = 10
+
+        distance = 20
+
+        @group = @game.add.group(null, 'pods')
+        @sprites = []
+        for i in [0...@maxPods]
+            sprite = @game.add.sprite(5 + distance * i, @game.height - 5, 'pod', null) #@group)
+            sprite.anchor.set(0, 1)
+            sprite.fixedToCamera = true
+            sprite.visible = false
+            @sprites.push(sprite)
+        @group.fixedToCamera = true
+
+    update: (numberOfPods) ->
+        for i in [0...@sprites.length]
+            @sprites[i].visible = i < numberOfPods
+
 class ProjectileEmitter extends Phaser.Particles.Arcade.Emitter
     constructor: (@planet, game, maxParticles) ->
         super(game, 0, 0, maxParticles)
@@ -310,6 +330,7 @@ class GameState
     preload: ->
         @game.load.image('projectile0', 'assets/baby.png')
         @game.load.image('projectile1', 'assets/sperm.png')
+        @game.load.image('pod', 'assets/baby.png')
 
         @game.load.audio('sperm', ['assets/sperm.ogg'])
         @game.load.audio('baby', ['assets/baby.ogg'])
@@ -383,8 +404,8 @@ class GameState
 
         @spermView = @game.add.text(@game.width - 220, @game.height - 16, '----', { font: "16px Arial", fill: '#ffffff' })
         @spermView.fixedToCamera = true
-        @podView = @game.add.text(5, @game.height - 16, '----', { font: "16px Arial", fill: '#4488ff' })
-        @podView.fixedToCamera = true
+
+        @podView = new PodView(@game)
 
         @startTime = @game.time.now  # ms
         @year = 0
@@ -398,7 +419,7 @@ class GameState
                 @planets[0].updatePodCount()
                 @planets[0].females.randomKills()
                 @planets[1].males.randomKills()
-                @podView.text = "Baby Pods ready for launch: #{@planets[0].podCount}"
+                @podView.update(@planets[0].podCount)
                 if @planets[0].females.getFertilePopulation() == 0 or @planets[1].males.getFertilePopulation() == 0
                     @setGameOver()
             this
