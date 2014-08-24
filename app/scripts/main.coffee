@@ -2,7 +2,7 @@ tweaks = {
     tickLength: 100  # ms
     yearLength: 30
     babiesInProjectile: 100
-    babyProbability: .001
+    babyProbability: .01
     # Number of sperms produced per man per tick
     maleFertility: 1e-3
     maxSpermBank: 1000
@@ -209,9 +209,9 @@ planetData = [
     # 0 venus
     {
         class: Venus
-        diameter: 12
+        diameter: 30
         orbitalPeriod: 200
-        orbitalDistance: 80
+        orbitalDistance: 107
         orbitPhase: .3
         gravity: 1e5
         launchPeriod: 1000
@@ -222,21 +222,29 @@ planetData = [
         class: Mars
         diameter: 15
         orbitalPeriod: 120
-        orbitalDistance: 150
+        orbitalDistance: 220
         orbitPhase: 0
         gravity: 1e5
         launchPeriod: 20
         launchSpeed: 200
     }
-    # 2 earth
+    # mercury
     {
-        diameter: 20
+        diameter: 12
+        orbitPhase: Math.PI * 2 * .6
+        orbitalPeriod: 6
+        orbitalDistance: 40
+        gravity: .3e5
+    }
+    # earth
+    {
+        diameter: 32
         orbitPhase: Math.PI / 2
         orbitalPeriod: tweaks.yearLength
-        orbitalDistance: 100
+        orbitalDistance: 150
         gravity: 1e5
     }
-    # 3 sun
+    # sun
     {
         diameter: 60
         orbitalPeriod: 1
@@ -354,7 +362,7 @@ class MenuState
     render: ->
 
 start = ->
-    game = new Phaser.Game(800, 300, Phaser.CANVAS, 'LD30')
+    game = new Phaser.Game(800, 600, Phaser.CANVAS, 'LD30')
     game.state.add('menu', MenuState)
     game.state.add('game', GameState)
     game.state.start('game')

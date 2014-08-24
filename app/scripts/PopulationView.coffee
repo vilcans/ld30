@@ -1,4 +1,4 @@
-textSize = 7
+textSize = 16
 
 class @PopulationView
     constructor: (@game, @population, x) ->
