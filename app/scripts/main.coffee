@@ -42,7 +42,8 @@ class Planet
     # for overriding
     particleClass: Phaser.Particle
 
-    constructor: (@id, {gravity, @diameter, @orbitalPeriod, @orbitalDistance, @launchPeriod, @launchSpeed, @orbitPhase}) ->
+    constructor: (@id, {gravity, @diameter, @orbitalPeriod, @orbitalDistance, @launchPeriod, @launchSpeed, launchJitter, @orbitPhase}) ->
+        @launchJitter = launchJitter or 0
         @gravity = gravity or 0
         @radius = @diameter / 2
         @orbitPhase ?= 0
@@ -130,8 +131,8 @@ class Planet
             cos = Math.cos(angle)
             xspeed = cos * @launchSpeed + @velocity.x
             yspeed = sin * @launchSpeed + @velocity.y
-            @emitter.setXSpeed(xspeed, xspeed)
-            @emitter.setYSpeed(yspeed, yspeed)
+            @emitter.setXSpeed(xspeed - @launchJitter, xspeed + @launchJitter)
+            @emitter.setYSpeed(yspeed - @launchJitter, yspeed + @launchJitter)
             @emitter.emitX = @center.x + @radiusE * cos
             @emitter.emitY = @center.y + @radiusE * sin
             @emitter.forEachExists(gameState.updateGravity, gameState)
@@ -227,6 +228,7 @@ planetData = [
         gravity: 1e5
         launchPeriod: 20
         launchSpeed: 200
+        launchJitter: 10
     }
     # mercury
     {
