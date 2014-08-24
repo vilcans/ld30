@@ -39,8 +39,10 @@ class @PopulationView
             @primaryWidths[i] = width
 
         @graphics.clear()
-        @graphics.lineStyle(lineThickness, @colors.bar, .3)
+        @graphics.lineStyle(lineThickness, @colors.barUnderage, .3)
         for i in [0...@population.numberOfAges]
+            if i == @population.fertilityAge
+                @graphics.lineStyle(lineThickness, @colors.bar, .3)
             width = @primaryWidths[i]
             if width == 0
                 continue

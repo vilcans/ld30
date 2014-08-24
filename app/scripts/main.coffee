@@ -174,7 +174,7 @@ class Venus extends Planet
         @podCount = 0
         @females = new Population([
             0,
-            100000 / 2,
+            0,
             95000 / 2,
             90000 / 2,
             85000 / 2,
@@ -216,7 +216,7 @@ class Mars extends Planet
         @spermAmount = 0
         @males = new Population([
             0,
-            100000 / 2,
+            0,
             95000 / 2,
             90000 / 2,
             85000 / 2,
@@ -371,13 +371,21 @@ class GameState
             @game,
             @planets[0].females, @planets[0].males,
             'Females on Venus (age groups)',
-            5, {bar: 0xff8800, secondaryBar: 0x88ccff}, false
+            5, {
+                bar: 0xff8800
+                barUnderage: 0xffcc88
+                secondaryBar: 0x88ccff
+            },
+            false
         )
         @populationView1 = new PopulationView(
             @game,
             @planets[1].males, null,
             'Males on Mars (age groups)',
-            @game.width - 220, {bar: 0x0088ff}, true
+            @game.width - 220, {
+                bar: 0x0088ff
+                barUnderage: 0x88ccff
+            }, true
         )
 
         @spermView = @game.add.text(@game.width - 220, @game.height - 16, '----', { font: "16px Arial", fill: '#ffffff' })
