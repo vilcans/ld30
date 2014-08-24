@@ -1,6 +1,7 @@
 textSize = 16
 lineDistance = 16
 lineThickness = 6
+alpha = .7
 
 pyramidScale = 400 / 60000
 
@@ -39,10 +40,10 @@ class @PopulationView
             @primaryWidths[i] = width
 
         @graphics.clear()
-        @graphics.lineStyle(lineThickness, @colors.barUnderage, .3)
+        @graphics.lineStyle(lineThickness, @colors.barUnderage, alpha)
         for i in [0...@population.numberOfAges]
             if i == @population.fertilityAge
-                @graphics.lineStyle(lineThickness, @colors.bar, .3)
+                @graphics.lineStyle(lineThickness, @colors.bar, alpha)
             width = @primaryWidths[i]
             if width == 0
                 continue
@@ -55,7 +56,7 @@ class @PopulationView
                 @graphics.lineTo(width + 5, y)
 
         if @secondary
-            @graphics.lineStyle(lineThickness, @colors.secondaryBar, .3)
+            @graphics.lineStyle(lineThickness, @colors.secondaryBar, alpha)
             for i in [0...@secondary.numberOfAges]
                 width = @secondary.getPopulationForAge(i) * pyramidScale
                 if width == 0
