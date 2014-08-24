@@ -42,7 +42,7 @@ class Planet
     # for overriding
     particleClass: Phaser.Particle
 
-    constructor: (@id, {gravity, @diameter, @orbitalPeriod, @orbitalDistance, @launchPeriod, @launchSpeed, launchJitter, @orbitPhase}) ->
+    constructor: (@id, {gravity, @diameter, @orbitalPeriod, @orbitalDistance, @launchPeriod, @launchSpeed, launchJitter, @orbitPhase, @color}) ->
         @launchJitter = launchJitter or 0
         @gravity = gravity or 0
         @radius = @diameter / 2
@@ -72,7 +72,7 @@ class Planet
     createSprite: (game) ->
         bmd = game.add.bitmapData(@diameter, @diameter)
 
-        bmd.ctx.fillStyle = '#999999'
+        bmd.ctx.fillStyle = @color
         bmd.ctx.beginPath()
         bmd.ctx.arc(@radius, @radius, @radius, 0, Math.PI * 2, true)
         bmd.ctx.closePath()
@@ -210,6 +210,7 @@ planetData = [
     # 0 venus
     {
         class: Venus
+        color: '#b77424'
         diameter: 30
         orbitalPeriod: Math.round(.6 * tweaks.yearLength)
         orbitalDistance: 107
@@ -221,6 +222,7 @@ planetData = [
     # 1 mars
     {
         class: Mars
+        color: '#d84e1e'
         diameter: 15
         orbitalPeriod: Math.round(1.88 * tweaks.yearLength)
         orbitalDistance: 220
@@ -232,6 +234,7 @@ planetData = [
     }
     # mercury
     {
+        color: '#556677'
         diameter: 12
         orbitPhase: Math.PI * 2 * .6
         orbitalPeriod: Math.round(.24 * tweaks.yearLength)
@@ -240,6 +243,7 @@ planetData = [
     }
     # earth
     {
+        color: '#252983'
         diameter: 32
         orbitPhase: Math.PI / 2
         orbitalPeriod: tweaks.yearLength
@@ -248,6 +252,7 @@ planetData = [
     }
     # sun
     {
+        color: '#ffebd8'
         diameter: 60
         orbitalPeriod: 1
         orbitalDistance: 0
