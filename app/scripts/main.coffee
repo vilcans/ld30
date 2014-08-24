@@ -312,12 +312,15 @@ class GameState
 
         @game.load.audio('sperm', ['assets/sperm.ogg'])
         @game.load.audio('baby', ['assets/baby.ogg'])
+        @game.load.audio('music', ['assets/LD30.ogg'])
 
     create: ->
         @sounds = {
-            sperm: @game.add.audio('sperm', .5, true)
+            sperm: @game.add.audio('sperm', .3, true)
             baby: @game.add.audio('baby', .5, false)
+            music: @game.add.audio('music', .5, true)
         }
+        @sounds.music.play()
 
         @game.world.setBounds(-1000, -1000, 2000, 2000)
         @game.world.camera.focusOnXY(0, 0)
