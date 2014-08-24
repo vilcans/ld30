@@ -367,9 +367,9 @@ class GameState
         for planet in @planets
             planet.prepare(this)
 
-        @populationView0 = new PopulationView(@game, @planets[0].females, 'Females on Venus (age groups)', 5)
-        @populationView0b = new PopulationView(@game, @planets[0].males, 'Males on Venus (age groups)', 100)
-        @populationView1 = new PopulationView(@game, @planets[1].males, 'Males on Mars (age groups)', @game.width - 220)
+        @populationView0 = new PopulationView(@game, @planets[0].females, 'Females on Venus (age groups)', 5, {bar: 0xff8800}, false)
+        @populationView0b = new PopulationView(@game, @planets[0].males, 'Males on Venus (age groups)', 100, {bar: 0x88ccff}, false)
+        @populationView1 = new PopulationView(@game, @planets[1].males, 'Males on Mars (age groups)', @game.width - 220, {bar: 0x0088ff}, true)
         @spermView = @game.add.text(@game.width - 220, @game.height - 16, '----', { font: "16px Arial", fill: '#ffffff' })
         @spermView.fixedToCamera = true
         @podView = @game.add.text(5, @game.height - 16, '----', { font: "16px Arial", fill: '#4488ff' })
