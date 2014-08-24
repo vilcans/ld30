@@ -148,15 +148,15 @@ class Venus extends Planet
         @podCount = 0
         @females = new Population([
             0,
-            1000,
-            950,
-            900,
-            850,
-            800,
-            750,
-            700,
-            650,
-            600,
+            1000 / 2,
+            950 / 2,
+            900 / 2,
+            850 / 2,
+            800 / 2,
+            750 / 2,
+            700 / 2,
+            650 / 2,
+            600 / 2,
         ])
         @males = new Population([0, 0, 0])
     receiveProjectile: (particle) ->
@@ -187,15 +187,15 @@ class Mars extends Planet
         @spermAmount = 0
         @males = new Population([
             0,
-            1000,
-            950,
-            900,
-            850,
-            800,
-            750,
-            700,
-            650,
-            600,
+            1000 / 2,
+            950 / 2,
+            900 / 2,
+            850 / 2,
+            800 / 2,
+            750 / 2,
+            700 / 2,
+            650 / 2,
+            600 / 2,
         ])
 
     receiveProjectile: (particle) ->
@@ -224,9 +224,9 @@ planetData = [
         diameter: 30
         orbitalPeriod: Math.round(.6 * tweaks.yearLength)
         orbitalDistance: 107
-        orbitPhase: .3
+        orbitPhase: Math.PI
         gravity: 1e5
-        launchPeriod: 1000
+        launchPeriod: 500
         launchSpeed: 250
     }
     # 1 mars
