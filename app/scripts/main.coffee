@@ -8,6 +8,10 @@ tweaks = {
     # Number of sperms produced per man per tick
     maleFertility: 1e-3
     maxSpermBank: 1000
+
+    femaleMortality: .05
+    maleMortality: .10
+    fertilityAge: 2
 }
 
 class ProjectileEmitter extends Phaser.Particles.Arcade.Emitter
@@ -165,7 +169,7 @@ class Venus extends Planet
             700 / 2,
             650 / 2,
             600 / 2,
-        ])
+        ], tweaks.fertilityAge, tweaks.femaleMortality)
         @males = new Population([0, 0])
     receiveProjectile: (particle) ->
         particle.receiveByVenus(this)
@@ -204,7 +208,7 @@ class Mars extends Planet
             700 / 2,
             650 / 2,
             600 / 2,
-        ])
+        ], tweaks.fertilityAge, tweaks.maleMortality)
 
     receiveProjectile: (particle) ->
         particle.receiveByMars(this)
