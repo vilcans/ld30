@@ -26,3 +26,20 @@ class @Population
         for i in [@fertilityAge...@numberOfAges]
             s += @agePyramid[i]
         return s
+
+    getTotal: ->
+        s = 0
+        for age in @agePyramid
+            s += age
+        return s
+
+    # Remove the oldest `count` people
+    remove: (count) ->
+        left = count
+        i = @agePyramid.length
+        while --i >= 0
+            if @agePyramid[i] >= left
+                @agePyramid[i] -= left
+                return
+            left -= @agePyramid[i]
+            @agePyramid[i] = 0

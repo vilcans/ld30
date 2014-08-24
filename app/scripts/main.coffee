@@ -14,9 +14,9 @@ class ProjectileEmitter extends Phaser.Particles.Arcade.Emitter
 
     # overrides Emitter
     emitParticle: ->
-        if not @planet.population.hasProjectiles()
+        if not @planet.canLaunch()
             return
-        @planet.population.decreaseProjectiles(1)
+        @planet.onLaunch()
         super()
 
 class Sperm extends Phaser.Particle
@@ -25,25 +25,24 @@ class Sperm extends Phaser.Particle
         if venus.rnd.frac() < tweaks.babyProbability
             return
         if venus.rnd.frac() < .5
-            venus.population.addBabies(1)
+            venus.females.addBabies(1)
         else
-            venus.population.projectiles += 1
+            venus.males.addBabies(1)
     receiveByMars: (mars) ->
         # wasted
 
 class Baby extends Phaser.Particle
     quantity: 100
     receiveByVenus: (venus) ->
-        # returned to Venus
-        venus.population.addBabies(tweaks.babiesInProjectile)
+        # returned to Venus; wasted
     receiveByMars: (mars) ->
-        mars.population.addBabies(tweaks.babiesInProjectile)
+        mars.males.addBabies(tweaks.babiesInProjectile)
 
 class Planet
     # for overriding
     particleClass: Phaser.Particle
 
-    constructor: (@id, {gravity, @diameter, @orbitalPeriod, @orbitalDistance, @launchPeriod, @launchSpeed, @orbitPhase, @population}) ->
+    constructor: (@id, {gravity, @diameter, @orbitalPeriod, @orbitalDistance, @launchPeriod, @launchSpeed, @orbitPhase}) ->
         @gravity = gravity or 0
         @radius = @diameter / 2
         @orbitPhase ?= 0
@@ -96,7 +95,7 @@ class Planet
         @launcherAngle = Phaser.Math.angleBetween(@center.x, @center.y, x, y)
 
     startEmitting: ->
-        if @emitting or not @population.hasProjectiles()
+        if @emitting or not @canLaunch()
             return
         @emitter.start(false, 20000, @launchPeriod, 0)
         @emitting = true
@@ -124,7 +123,7 @@ class Planet
 
     update: (gameState) ->
         if @emitter
-            if @emitting and not @population.hasProjectiles()
+            if @emitting and not @canLaunch()
                 @stopEmitting()
             angle = @launcherAngle
             sin = Math.sin(angle)
@@ -145,7 +144,7 @@ class Venus extends Planet
     constructor: (args...) ->
         super(args...)
         @rnd = new Phaser.RandomDataGenerator
-        @population = new Population([
+        @females = new Population([
             0,
             1000,
             950,
@@ -157,18 +156,25 @@ class Venus extends Planet
             650,
             600,
         ])
+        @males = new Population([0, 0, 0])
     receiveProjectile: (particle) ->
         particle.receiveByVenus(this)
     advanceYear: ->
-        @population.increaseAges()
-        @population.projectiles = 0
+        @females.increaseAges()
+        @males.increaseAges()
+
+    canLaunch: ->
+        return @males.getTotal() >= tweaks.babiesInProjectile
+    onLaunch: ->
+        pyramid = @males.agePyramid
+        @males.remove(tweaks.babiesInProjectile)
 
 class Mars extends Planet
     particleClass: Sperm
 
     constructor: (args...) ->
         super(args...)
-        @population = new Population([
+        @males = new Population([
             0,
             1000,
             950,
@@ -185,13 +191,19 @@ class Mars extends Planet
         particle.receiveByMars(this)
 
     produceSperm: ->
-        spermProduction = Math.ceil(@population.getFertilePopulation() * tweaks.maleFertility)
-        @population.projectiles += spermProduction
-        if @population.projectiles > tweaks.maxSpermBank
-            @population.projectiles = tweaks.maxSpermBank
+        spermProduction = Math.ceil(@males.getFertilePopulation() * tweaks.maleFertility)
+        @males.projectiles += spermProduction
+        if @males.projectiles > tweaks.maxSpermBank
+            @males.projectiles = tweaks.maxSpermBank
 
     advanceYear: ->
-        @population.increaseAges()
+        @males.increaseAges()
+
+    canLaunch: ->
+        return @males.projectiles > 0
+
+    onLaunch: ->
+        @males.projectiles -= 1
 
 planetData = [
     # 0 venus
@@ -272,8 +284,9 @@ class GameState
         for planet in @planets
             planet.createSprite(@game)
 
-        @populationView0 = new PopulationView(@game, @planets[0].population, 5)
-        @populationView1 = new PopulationView(@game, @planets[1].population, @game.width - 120)
+        @populationView0 = new PopulationView(@game, @planets[0].females, 5)
+        @populationView0b = new PopulationView(@game, @planets[0].males, 100)
+        @populationView1 = new PopulationView(@game, @planets[1].males, @game.width - 120)
 
         @startTime = @game.time.now  # ms
         @year = 0
@@ -304,6 +317,7 @@ class GameState
             planet.update(this)
 
         @populationView0.update()
+        @populationView0b.update()
         @populationView1.update()
         return
 
