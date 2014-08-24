@@ -86,6 +86,9 @@ class Planet
         @velocity.y = -cos * @orbitSpeed
         return
 
+    prepare: (gameState) ->
+        @gameState = gameState
+
     createSprite: (game) ->
         bmd = game.add.bitmapData(@diameter, @diameter)
 
@@ -113,8 +116,6 @@ class Planet
         @launcherAngle = Phaser.Math.angleBetween(@center.x, @center.y, x, y)
 
     startEmitting: ->
-        if @emitting or not @canLaunch()
-            return
         @emitter.start(false, 20000, @launchPeriod, 0)
         @emitting = true
 
@@ -126,7 +127,8 @@ class Planet
 
     select: (pointer) ->
         @selectedWithPointer = pointer
-        @startEmitting()
+        if not @emitting and @canLaunch()
+            @startEmitting()
 
     deselect: (pointerId) ->
         if not @selectedWithPointer
@@ -196,6 +198,8 @@ class Venus extends Planet
         pyramid = @males.agePyramid
         @males.remove(tweaks.babiesInProjectile)
 
+        @gameState.sounds.baby.play()
+
 class Mars extends Planet
     particleClass: Sperm
 
@@ -232,6 +236,14 @@ class Mars extends Planet
 
     onLaunch: ->
         @spermAmount -= 1
+
+    startEmitting: (args...) ->
+        super(args...)
+        @gameState.sounds.sperm.play('', undefined, undefined, true)
+
+    stopEmitting: (args...) ->
+        super(args...)
+        @gameState.sounds.sperm.stop()
 
 planetData = [
     # 0 venus
@@ -298,7 +310,15 @@ class GameState
         @game.load.image('projectile0', 'assets/baby.png')
         @game.load.image('projectile1', 'assets/sperm.png')
 
+        @game.load.audio('sperm', ['assets/sperm.ogg'])
+        @game.load.audio('baby', ['assets/baby.ogg'])
+
     create: ->
+        @sounds = {
+            sperm: @game.add.audio('sperm', .5, true)
+            baby: @game.add.audio('baby', .5, false)
+        }
+
         @game.world.setBounds(-1000, -1000, 2000, 2000)
         @game.world.camera.focusOnXY(0, 0)
 
@@ -325,6 +345,9 @@ class GameState
 
         for planet in @planets
             planet.createSprite(@game)
+
+        for planet in @planets
+            planet.prepare(this)
 
         @populationView0 = new PopulationView(@game, @planets[0].females, 'Females on Venus (age groups)', 5)
         @populationView0b = new PopulationView(@game, @planets[0].males, 'Males on Venus (age groups)', 100)
