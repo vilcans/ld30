@@ -3,7 +3,7 @@ tweaks = {
 }
 
 class Planet
-    constructor: ({gravity, @diameter, @orbitalPeriod, @orbitalDistance, @launchPeriod, @launchSpeed, @orbitPhase, @population}) ->
+    constructor: (@id, {gravity, @diameter, @orbitalPeriod, @orbitalDistance, @launchPeriod, @launchSpeed, @orbitPhase, @population}) ->
         @gravity = gravity or 0
         @radius = @diameter / 2
         @orbitPhase ?= 0
@@ -43,6 +43,12 @@ class Planet
 
         @sprite.inputEnabled = true
 
+    addEmitter: (game, launchPeriod) ->
+        emitter = game.add.emitter(0, 0, launchPeriod)
+        emitter.gravity = 0
+        emitter.makeParticles("projectile#{@id}")
+        @emitter = emitter
+
     # Point the launcher at a world coordinate
     setDirection: (x, y) ->
         @launcherAngle = Phaser.Math.angleBetween(@center.x, @center.y, x, y)
@@ -73,6 +79,19 @@ class Planet
         @stopEmitting()
 
     isSelected: -> @selectedWithPointerId != null
+
+    update: (gameState) ->
+        if @emitter
+            angle = @launcherAngle
+            sin = Math.sin(angle)
+            cos = Math.cos(angle)
+            xspeed = cos * @launchSpeed + @velocity.x
+            yspeed = sin * @launchSpeed + @velocity.y
+            @emitter.setXSpeed(xspeed, xspeed)
+            @emitter.setYSpeed(yspeed, yspeed)
+            @emitter.emitX = @center.x + @radiusE * cos
+            @emitter.emitY = @center.y + @radiusE * sin
+            @emitter.forEachExists(gameState.updateGravity, gameState)
 
 planetData = [
     # 0 venus
@@ -129,19 +148,14 @@ class GameState
         @game.world.setBounds(-1000, -1000, 2000, 2000)
         @game.world.camera.focusOnXY(0, 0)
 
-        @planets = (new Planet(data) for data in planetData)
-
-        for i in [0, 1]
-            emitter = @game.add.emitter(0, 0, 1000)
-            emitter.gravity = 0
-            emitter.makeParticles("projectile#{i}")
-            @planets[i].emitter = emitter
+        @planets = (new Planet(i, data) for data, i in planetData)
+        @planets[0].addEmitter(@game, 10)
+        @planets[1].addEmitter(@game, 1000)
 
         @game.input.onDown.add(
             (pointer, event) ->
                 for planet in @planets
                     if planet.emitter and not planet.emitting and planet.sprite.input.pointerOver(pointer.id)
-                        console.log 'selecting', planet
                         planet.select(pointer)
                         break
                 return
@@ -175,19 +189,8 @@ class GameState
             @year = newYear
 
         for planet in @planets
-            if planet.emitter
-                angle = planet.launcherAngle
-                sin = Math.sin(angle)
-                cos = Math.cos(angle)
-                xspeed = cos * planet.launchSpeed + planet.velocity.x
-                yspeed = sin * planet.launchSpeed + planet.velocity.y
-                planet.emitter.setXSpeed(xspeed, xspeed)
-                planet.emitter.setYSpeed(yspeed, yspeed)
-                planet.emitter.emitX = planet.center.x + planet.radiusE * cos
-                planet.emitter.emitY = planet.center.y + planet.radiusE * sin
-                planet.emitter.forEachExists(@updateGravity, this)
-
             planet.setDirection(@game.input.worldX, @game.input.worldY)
+            planet.update(this)
 
         @populationView0.update()
         return
