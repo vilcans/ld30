@@ -185,7 +185,8 @@ class Venus extends Planet
         @males.increaseAges()
 
     canLaunch: ->
-        return @podCount > 0 and @males.getTotal() >= tweaks.babiesInProjectile
+        return @podCount > 0 and @males.getTotal() >= tweaks.babiesInProjectile and @females.getFertilePopulation() > 0
+
     updatePodCount: ->
         t = Math.floor(@males.getTotal() / tweaks.babiesInProjectile)
         if t == @podCount
@@ -232,7 +233,7 @@ class Mars extends Planet
         @males.increaseAges()
 
     canLaunch: ->
-        return @spermAmount > 0
+        return @spermAmount > 0 and @males.getFertilePopulation() > 0
 
     onLaunch: ->
         @spermAmount -= 1
