@@ -13,6 +13,8 @@ tweaks = {
     femaleMortality: .010
     maleMortality: .010
     fertilityAge: 2
+
+    timeBetweenSpermSounds: 100
 }
 
 monthNames = [
@@ -45,6 +47,10 @@ class Sperm extends Phaser.Particle
         girls = Math.round((venus.rnd.frac() + venus.rnd.frac() + venus.rnd.frac()) / 3 * tweaks.babiesPerSperm)
         venus.females.addBabies(girls)
         venus.males.addBabies(tweaks.babiesPerSperm - girls)
+        if venus.gameState.game.time.now - venus.gameState.lastSpermPlay > tweaks.timeBetweenSpermSounds
+            venus.gameState.sounds.receiveSperm.play()
+            venus.gameState.lastSpermPlay = venus.gameState.game.time.now
+
     receiveByMars: (mars) ->
         # wasted
 
@@ -54,6 +60,7 @@ class Baby extends Phaser.Particle
         # returned to Venus; wasted
     receiveByMars: (mars) ->
         mars.males.addBabies(tweaks.babiesInProjectile)
+        mars.gameState.sounds.receiveBaby.play()
 
 class Planet
     # for overriding
@@ -313,13 +320,19 @@ class GameState
 
         @game.load.audio('sperm', ['assets/sperm.ogg'])
         @game.load.audio('baby', ['assets/baby.ogg'])
+        @game.load.audio('receive-sperm', ['assets/receive-sperm.ogg'])
+        @game.load.audio('receive-baby', ['assets/receive-baby.ogg'])
         @game.load.audio('music', ['assets/LD30.ogg'])
 
     create: ->
         @gameOn = true
+        @lastSpermPlay = 0
+
         @sounds = {
             sperm: @game.add.audio('sperm', .3, true)
             baby: @game.add.audio('baby', .5, false)
+            receiveSperm: @game.add.audio('receive-sperm', .3, false)
+            receiveBaby: @game.add.audio('receive-baby', .7, false)
             music: @game.add.audio('music', .5, true)
         }
         @sounds.music.play()
