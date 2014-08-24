@@ -2,7 +2,7 @@ tweaks = {
     tickLength: 100  # ms
     yearLength: 20
     babiesInProjectile: 5000
-    babiesPerSperm: 500
+    babiesPerSperm: 250
     babyProbability: 1
     # Min. number of available mothers for babyProbability to apply
     minMothers: 400000
@@ -10,8 +10,8 @@ tweaks = {
     maleFertility: .0001
     maxSpermBank: 1000
 
-    femaleMortality: .010
-    maleMortality: .010
+    femaleMortality: .003
+    maleMortality: .003
     fertilityAge: 2
 
     timeBetweenSpermSounds: 100
