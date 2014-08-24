@@ -1,18 +1,22 @@
 # LD30
 
-The population of Venus is aging.
-Soon there will be no fertile woman left.
-After the men moved to Mars, no children have been born.
-Some say it was a bad idea, leaving Earth to live on different planets.
-Some say it was for the best.
+Splitting the population of Earth by gender seemed like such a good idea.
+Women moved to Venus.
+Men moved to Mars.
+No more conflicts.
+
+But now, in the year 2100, the population of Venus is aging.
+No human has been born for years and soon there will be no fertile woman left.
 Putting old conflicts aside, the women request sperm to fertilize their eggs.
-The men on Mars oblige, if they get the boys that are born.
+The men on Mars oblige, on one condition:
+They will get the boys that are born on Venus.
 
 Being genderless and neutral in the old conflict between men and women,
 you are given the job to transport the sperm from Mars to Venus,
 using a cannon known as The Hose.
 After the sperm has produced babies on Venus,
-your task is to transport the boys to their home on Mars.
+your task is to transport the boys to their home on Mars
+by shooting Baby Pods into space.
 
 The survival of the human race is in your hands.
 
