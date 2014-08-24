@@ -62,7 +62,7 @@ class Planet
     stopEmitting: ->
         if not @emitting
             return
-        @emitter.start(false, 0, 1e9)  # stop it
+        @emitter.on = false
         @emitting = false
 
     select: (pointer) ->
