@@ -14,6 +14,10 @@ tweaks = {
     fertilityAge: 2
 }
 
+monthNames = [
+    'Janary', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'
+]
+
 class ProjectileEmitter extends Phaser.Particles.Arcade.Emitter
     constructor: (@planet, game, maxParticles) ->
         super(game, 0, 0, maxParticles)
@@ -331,6 +335,7 @@ class GameState
 
         @startTime = @game.time.now  # ms
         @year = 0
+        @gameTime = 0
         @tickTimer = @game.time.create()
         @tickTimer.loop(
             tweaks.tickLength,
@@ -344,17 +349,28 @@ class GameState
         @tickTimer.start()
         @game.time.add(@tickTimer)
 
+        @dateView = @game.add.text(5, 0, @getDateText(), { font: "16px Arial", fill: '#ffffff' })
+        @dateView.fixedToCamera = true
+
         return
 
+    getDateText: ->
+        month = Math.floor(@gameTime % (tweaks.yearLength * 12)) % 12
+        return "#{monthNames[@month]} #{@year + 2100}"
+
     update: ->
-        gameTime = @game.time.elapsedSecondsSince(@startTime)
+        @gameTime = @game.time.elapsedSecondsSince(@startTime)
         for planet in @planets
-            planet.setTime(gameTime)
-        newYear = Math.floor(gameTime / tweaks.yearLength)
+            planet.setTime(@gameTime)
+        newYear = Math.floor(@gameTime / tweaks.yearLength)
+        newMonth = Math.floor(@gameTime / tweaks.yearLength * 12) % 12
         if newYear != @year
             @planets[0].advanceYear()
             @planets[1].advanceYear()
             @year = newYear
+        if newMonth != @month
+            @month = newMonth
+            @dateView.text = @getDateText()
 
         for planet in @planets
             planet.setDirection(@game.input.worldX, @game.input.worldY)
