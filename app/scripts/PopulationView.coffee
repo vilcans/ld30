@@ -5,7 +5,7 @@ lineThickness = 6
 pyramidScale = 400 / 60000
 
 class @PopulationView
-    constructor: (@game, @population, heading, x, @colors, @right) ->
+    constructor: (@game, @population, @secondary, heading, x, @colors, @right) ->
         @texts = []
         style = { font: "#{textSize}px Arial", fill: '#8800ff' }
         y = @game.height - textSize * 2
@@ -22,23 +22,38 @@ class @PopulationView
         @graphics = @game.add.graphics(0, 0)
         @graphics.fixedToCamera = true
 
+        @primaryWidths = (0 for i in [0...@population.numberOfAges])
+
+    getYForBar: (age) ->
+         @game.height - 32 - age * lineDistance
+
     update: ->
         for i in [0...@population.numberOfAges]
             c = @population.getPopulationForAge(i)
             @texts[i].text = c
+            width = c * pyramidScale
+            @primaryWidths[i] = width
 
         @graphics.clear()
         @graphics.lineStyle(lineThickness, @colors.bar, .3)
         for i in [0...@population.numberOfAges]
-            c = @population.getPopulationForAge(i)
-            if c == 0
+            width = @primaryWidths[i]
+            if width == 0
                 continue
-            width = c * pyramidScale
-            y = @game.height - 32 - i * lineDistance
+            y = @getYForBar(i)
             if @right
                 @graphics.moveTo(@game.width - 5 - width, y)
                 @graphics.lineTo(@game.width - 5, y)
             else
                 @graphics.moveTo(5, y)
-                @graphics.lineTo(c * pyramidScale, y)
+                @graphics.lineTo(width + 5, y)
 
+        if @secondary
+            @graphics.lineStyle(lineThickness, @colors.secondaryBar, .3)
+            for i in [0...@secondary.numberOfAges]
+                width = @secondary.getPopulationForAge(i) * pyramidScale
+                if width == 0
+                    continue
+                y = @getYForBar(i)
+                @graphics.moveTo(5 + @primaryWidths[i], y)
+                @graphics.lineTo(5 + @primaryWidths[i] + width, y)
