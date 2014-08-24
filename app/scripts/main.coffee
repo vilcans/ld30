@@ -145,6 +145,7 @@ class Venus extends Planet
     constructor: (args...) ->
         super(args...)
         @rnd = new Phaser.RandomDataGenerator
+        @podCount = 0
         @females = new Population([
             0,
             1000,
@@ -165,7 +166,15 @@ class Venus extends Planet
         @males.increaseAges()
 
     canLaunch: ->
-        return @males.getTotal() >= tweaks.babiesInProjectile
+        return @podCount > 0 and @males.getTotal() >= tweaks.babiesInProjectile
+    updatePodCount: ->
+        t = Math.floor(@males.getTotal() / tweaks.babiesInProjectile)
+        if t == @podCount
+            return
+        #if t > @podCount
+        #    play new pod sound
+        @podCount = t
+
     onLaunch: ->
         pyramid = @males.agePyramid
         @males.remove(tweaks.babiesInProjectile)
@@ -303,6 +312,10 @@ class GameState
         @populationView0 = new PopulationView(@game, @planets[0].females, 'Females on Venus (age groups)', 5)
         @populationView0b = new PopulationView(@game, @planets[0].males, 'Males on Venus (age groups)', 100)
         @populationView1 = new PopulationView(@game, @planets[1].males, 'Males on Mars (age groups)', @game.width - 220)
+        @spermView = @game.add.text(@game.width - 220, @game.height - 16, '----', { font: "16px Arial", fill: '#ffffff' })
+        @spermView.fixedToCamera = true
+        @podView = @game.add.text(5, @game.height - 16, '----', { font: "16px Arial", fill: '#4488ff' })
+        @podView.fixedToCamera = true
 
         @startTime = @game.time.now  # ms
         @year = 0
@@ -311,6 +324,9 @@ class GameState
             tweaks.tickLength,
             ->
                 @planets[1].produceSperm()
+                @spermView.text = "Sperm Bank: #{@planets[1].spermAmount}"
+                @planets[0].updatePodCount()
+                @podView.text = "Baby Pods ready for launch: #{@planets[0].podCount}"
             this
         )
         @tickTimer.start()

@@ -4,7 +4,7 @@ class @PopulationView
     constructor: (@game, @population, heading, x) ->
         @texts = []
         style = { font: "#{textSize}px Arial", fill: '#8800ff' }
-        y = @game.height - textSize
+        y = @game.height - textSize * 2
 
         for i in [0...@population.numberOfAges]
             c = @population.getPopulationForAge(i)
