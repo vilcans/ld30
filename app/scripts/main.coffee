@@ -3,6 +3,8 @@ tweaks = {
     yearLength: 30
     babiesInProjectile: 25
     babyProbability: .01
+    # Min. number of available mothers for babyProbability to apply
+    minMothers: 400
     # Number of sperms produced per man per tick
     maleFertility: 1e-3
     maxSpermBank: 1000
@@ -22,7 +24,13 @@ class ProjectileEmitter extends Phaser.Particles.Arcade.Emitter
 class Sperm extends Phaser.Particle
     quantity: 1
     receiveByVenus: (venus) ->
-        if venus.rnd.frac() < tweaks.babyProbability
+        mothers = venus.females.getTotal()
+        # Decrease chance of baby if less than minMothers females
+        if mothers >= tweaks.minMothers
+            prob = tweaks.babyProbability
+        else
+            prob = mothers / tweaks.minMothers * tweaks.babyProbability
+        if venus.rnd.frac() < prob
             return
         if venus.rnd.frac() < .5
             venus.females.addBabies(1)
