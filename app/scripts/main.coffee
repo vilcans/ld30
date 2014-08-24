@@ -1,7 +1,7 @@
 tweaks = {
     tickLength: 100  # ms
     yearLength: 30
-    babiesInProjectile: 100
+    babiesInProjectile: 25
     babyProbability: .01
     # Number of sperms produced per man per tick
     maleFertility: 1e-3
@@ -211,7 +211,7 @@ planetData = [
     {
         class: Venus
         diameter: 30
-        orbitalPeriod: 200
+        orbitalPeriod: Math.round(.6 * tweaks.yearLength)
         orbitalDistance: 107
         orbitPhase: .3
         gravity: 1e5
@@ -222,19 +222,19 @@ planetData = [
     {
         class: Mars
         diameter: 15
-        orbitalPeriod: 120
+        orbitalPeriod: Math.round(1.88 * tweaks.yearLength)
         orbitalDistance: 220
         orbitPhase: 0
         gravity: 1e5
         launchPeriod: 20
         launchSpeed: 200
-        launchJitter: 10
+        launchJitter: 2
     }
     # mercury
     {
         diameter: 12
         orbitPhase: Math.PI * 2 * .6
-        orbitalPeriod: 6
+        orbitalPeriod: Math.round(.24 * tweaks.yearLength)
         orbitalDistance: 40
         gravity: .3e5
     }
