@@ -1,26 +1,14 @@
 class @Population
-    constructor: ->
-        @agePyramid = [
-            1000,
-            900,
-            800,
-            700,
-            600,
-            500,
-            400,
-            300,
-            200,
-            100
-        ]
-        #@mortality = 0
+    constructor: (@agePyramid, @fertilityAge=1) ->
         @numberOfAges = @agePyramid.length
-        @projectiles = 100
+        #@mortality = 0
+        @projectiles = 0
 
     getPopulationForAge: (age) ->
         return @agePyramid[age] or 0
 
-    advanceYear: ->
-        for i in [@agePyramid.length - 1..1]
+    increaseAges: ->
+        for i in [@numberOfAges - 1..1]
             @agePyramid[i] = @agePyramid[i - 1] #* (1 - @mortality)
         @agePyramid[0] = 0
 
@@ -32,3 +20,9 @@ class @Population
 
     decreaseProjectiles: (amount) ->
         @projectiles = Math.max(0, @projectiles - amount)
+
+    getFertilePopulation: ->
+        s = 0
+        for i in [@fertilityAge...@numberOfAges]
+            s += @agePyramid[i]
+        return s

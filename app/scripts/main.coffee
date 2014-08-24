@@ -1,7 +1,11 @@
 tweaks = {
-    yearLength: 10
+    tickLength: 100  # ms
+    yearLength: 30
     babiesInProjectile: 100
-    babyProbability: .01
+    babyProbability: .001
+    # Number of sperms produced per man per tick
+    maleFertility: 1e-3
+    maxSpermBank: 1000
 }
 
 class ProjectileEmitter extends Phaser.Particles.Arcade.Emitter
@@ -16,7 +20,10 @@ class ProjectileEmitter extends Phaser.Particles.Arcade.Emitter
         super()
 
 class Sperm extends Phaser.Particle
+    quantity: 1
     receiveByVenus: (venus) ->
+        if venus.rnd.frac() < tweaks.babyProbability
+            return
         if venus.rnd.frac() < .5
             venus.population.addBabies(1)
         else
@@ -25,6 +32,7 @@ class Sperm extends Phaser.Particle
         # wasted
 
 class Baby extends Phaser.Particle
+    quantity: 100
     receiveByVenus: (venus) ->
         # returned to Venus
         venus.population.addBabies(tweaks.babiesInProjectile)
@@ -137,16 +145,53 @@ class Venus extends Planet
     constructor: (args...) ->
         super(args...)
         @rnd = new Phaser.RandomDataGenerator
+        @population = new Population([
+            0,
+            1000,
+            950,
+            900,
+            850,
+            800,
+            750,
+            700,
+            650,
+            600,
+        ])
     receiveProjectile: (particle) ->
-        console.log 'Venus received', particle
         particle.receiveByVenus(this)
+    advanceYear: ->
+        @population.increaseAges()
+        @population.projectiles = 0
 
 class Mars extends Planet
     particleClass: Sperm
+
+    constructor: (args...) ->
+        super(args...)
+        @population = new Population([
+            0,
+            1000,
+            950,
+            900,
+            850,
+            800,
+            750,
+            700,
+            650,
+            600,
+        ])
+
     receiveProjectile: (particle) ->
-        console.log 'Mars received', particle
         particle.receiveByMars(this)
 
+    produceSperm: ->
+        spermProduction = Math.ceil(@population.getFertilePopulation() * tweaks.maleFertility)
+        @population.projectiles += spermProduction
+        if @population.projectiles > tweaks.maxSpermBank
+            @population.projectiles = tweaks.maxSpermBank
+
+    advanceYear: ->
+        @population.increaseAges()
 
 planetData = [
     # 0 venus
@@ -159,7 +204,6 @@ planetData = [
         gravity: 1e5
         launchPeriod: 1000
         launchSpeed: 250
-        population: new Population
     }
     # 1 mars
     {
@@ -171,7 +215,6 @@ planetData = [
         gravity: 1e5
         launchPeriod: 20
         launchSpeed: 200
-        population: new Population
     }
     # 2 earth
     {
@@ -234,16 +277,26 @@ class GameState
 
         @startTime = @game.time.now  # ms
         @year = 0
+        @tickTimer = @game.time.create()
+        @tickTimer.loop(
+            tweaks.tickLength,
+            ->
+                @planets[1].produceSperm()
+            this
+        )
+        @tickTimer.start()
+        @game.time.add(@tickTimer)
+
         return
 
     update: ->
-        gameTime = (@game.time.now - @startTime) / 1000
+        gameTime = @game.time.elapsedSecondsSince(@startTime)
         for planet in @planets
             planet.setTime(gameTime)
         newYear = Math.floor(gameTime / tweaks.yearLength)
         if newYear != @year
-            @planets[0].population.advanceYear()
-            @planets[1].population.advanceYear()
+            @planets[0].advanceYear()
+            @planets[1].advanceYear()
             @year = newYear
 
         for planet in @planets
