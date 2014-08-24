@@ -1,16 +1,17 @@
 tweaks = {
     tickLength: 100  # ms
     yearLength: 20
-    babiesInProjectile: 25
-    babyProbability: .01
+    babiesInProjectile: 2500
+    babiesPerSperm: 1000
+    babyProbability: 1
     # Min. number of available mothers for babyProbability to apply
-    minMothers: 400
+    minMothers: 400000
     # Number of sperms produced per man per tick
-    maleFertility: 1e-3
+    maleFertility: .0001
     maxSpermBank: 1000
 
-    femaleMortality: .05
-    maleMortality: .10
+    femaleMortality: .05e-2
+    maleMortality: .10e-1
     fertilityAge: 2
 }
 
@@ -40,10 +41,10 @@ class Sperm extends Phaser.Particle
             prob = mothers / tweaks.minMothers * tweaks.babyProbability
         if venus.rnd.frac() < prob
             return
-        if venus.rnd.frac() < .5
-            venus.females.addBabies(1)
-        else
-            venus.males.addBabies(1)
+
+        girls = Math.round((venus.rnd.frac() + venus.rnd.frac() + venus.rnd.frac()) / 3 * tweaks.babiesPerSperm)
+        venus.females.addBabies(girls)
+        venus.males.addBabies(tweaks.babiesPerSperm - girls)
     receiveByMars: (mars) ->
         # wasted
 
@@ -164,15 +165,15 @@ class Venus extends Planet
         @podCount = 0
         @females = new Population([
             0,
-            1000 / 2,
-            950 / 2,
-            900 / 2,
-            850 / 2,
-            800 / 2,
-            750 / 2,
-            700 / 2,
-            650 / 2,
-            600 / 2,
+            100000 / 2,
+            95000 / 2,
+            90000 / 2,
+            85000 / 2,
+            80000 / 2,
+            75000 / 2,
+            70000 / 2,
+            65000 / 2,
+            60000 / 2,
         ], tweaks.fertilityAge, tweaks.femaleMortality)
         @males = new Population([0, 0])
     receiveProjectile: (particle) ->
@@ -203,15 +204,15 @@ class Mars extends Planet
         @spermAmount = 0
         @males = new Population([
             0,
-            1000 / 2,
-            950 / 2,
-            900 / 2,
-            850 / 2,
-            800 / 2,
-            750 / 2,
-            700 / 2,
-            650 / 2,
-            600 / 2,
+            100000 / 2,
+            95000 / 2,
+            90000 / 2,
+            85000 / 2,
+            80000 / 2,
+            75000 / 2,
+            70000 / 2,
+            65000 / 2,
+            60000 / 2,
         ], tweaks.fertilityAge, tweaks.maleMortality)
 
     receiveProjectile: (particle) ->
@@ -343,6 +344,8 @@ class GameState
                 @planets[1].produceSperm()
                 @spermView.text = "Sperm Bank: #{@planets[1].spermAmount}"
                 @planets[0].updatePodCount()
+                @planets[0].females.randomKills()
+                @planets[1].males.randomKills()
                 @podView.text = "Baby Pods ready for launch: #{@planets[0].podCount}"
             this
         )

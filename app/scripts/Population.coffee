@@ -35,3 +35,8 @@ class @Population
                 return
             left -= @agePyramid[i]
             @agePyramid[i] = 0
+
+    randomKills: ->
+        for i in [@fertilityAge...@numberOfAges]
+            kills = Math.ceil(@agePyramid[i] * @mortality)
+            @agePyramid[i] -= kills
