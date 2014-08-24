@@ -20,6 +20,13 @@ class @Population
             s += @agePyramid[i++]
         return s
 
+    getUnderagePopulation: ->
+        s = 0
+        i = 0
+        while i < @fertilityAge
+            s += @agePyramid[i++]
+        return s
+
     getTotal: ->
         s = 0
         for age in @agePyramid
