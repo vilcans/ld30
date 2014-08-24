@@ -10,8 +10,8 @@ tweaks = {
     maleFertility: .0001
     maxSpermBank: 1000
 
-    femaleMortality: .05e-2
-    maleMortality: .10e-1
+    femaleMortality: .010
+    maleMortality: .010
     fertilityAge: 2
 }
 
