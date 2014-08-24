@@ -35,7 +35,10 @@ class ProjectileEmitter extends Phaser.Particles.Arcade.Emitter
 class Sperm extends Phaser.Particle
     quantity: 1
     receiveByVenus: (venus) ->
-        mothers = venus.females.getTotal()
+        mothers = venus.females.getFertilePopulation() - venus.females.getUnderagePopulation()
+        #if mothers < 1
+        #    console.log 'no mother available'
+        #    return
         # Decrease chance of baby if less than minMothers females
         if mothers >= tweaks.minMothers
             prob = tweaks.babyProbability
