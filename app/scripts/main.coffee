@@ -8,8 +8,14 @@ tweaks = {
     maleFertility: .0001
     maxSpermBank: 1000
 
-    femaleMortality: .003
-    maleMortality: .003
+    femaleMortality: {
+        percentage: .003
+        absolute: 10
+    }
+    maleMortality: {
+        percentage: .003
+        absolute: 10
+    }
     fertilityAge: 2
 
     timeBetweenSpermSounds: 100
@@ -197,7 +203,7 @@ class Venus extends Planet
             65000 / 2,
             60000 / 2,
         ], tweaks.fertilityAge, tweaks.femaleMortality)
-        @males = new Population([0, 0])
+        @males = new Population([0, 0], tweaks.fertilityAge, tweaks.maleMortality)
     receiveProjectile: (particle) ->
         particle.receiveByVenus(this)
     advanceYear: ->

@@ -1,5 +1,5 @@
 class @Population
-    constructor: (@agePyramid, @fertilityAge=1, @mortality=0) ->
+    constructor: (@agePyramid, @fertilityAge=1, @mortality) ->
         @numberOfAges = @agePyramid.length
 
     getPopulationForAge: (age) ->
@@ -7,7 +7,7 @@ class @Population
 
     increaseAges: ->
         for i in [@numberOfAges - 1..1]
-            @agePyramid[i] = Math.round(@agePyramid[i - 1] * (1 - @mortality))
+            @agePyramid[i] = @agePyramid[i - 1]
         @agePyramid[0] = 0
 
     addBabies: (count) ->
@@ -46,5 +46,8 @@ class @Population
 
     randomKills: ->
         for i in [0...@numberOfAges]
-            kills = Math.ceil(@agePyramid[i] * @mortality)
+            kills = Math.ceil(@agePyramid[i] * @mortality.percentage + @mortality.absolute)
             @agePyramid[i] -= kills
+            if @agePyramid[i] < 0
+                @agePyramid[i] = 0
+        return
